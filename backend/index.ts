@@ -1,8 +1,8 @@
 import admin from 'firebase-admin';
 import express from 'express';
-import type { Cuisine, DietaryRestrictions, Recipe } from './types';
+import type { Recipe } from './types';
 
-const serviceAccount = require('../service-account.json');
+const serviceAccount = require('./service-account.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -16,29 +16,64 @@ app.use(express.json());
 
 const recipeCollection = db.collection('recipes');
 
+/**
+ * Returns whether one array contains every element of another
+ * @param target the array to check
+ * @param ref the reference array
+ * @returns true iff target contains every element of ref, false otherwise
+ */
 function containsAll<T>(target: readonly T[], ref: readonly T[]) {
-    return target && ref && ref.every(target.includes);
+    return ref.every(e => target.includes(e));
 }
 
+/**
+ * Returns whether an array contains some elements of another
+ * @param target the array to check
+ * @param ref the reference array
+ * @returns true iff target contains some element(s) of ref, false otherwise
+ */
 function containsSome<T>(target: readonly T[], ref: readonly T[]) {
-    return target && ref && ref.some(target.includes);
+    return ref.some(e => target.includes(e));
 }
+
+app.get('/', (_req, res) => {
+    res.send('Welcome to recipes backend!');
+});
 
 app.get('/recipes', async (req, res) => {
-    const qCuisines = req.query['cuisine'] as Cuisine[];
-    const qRestrictions = req.query['restrictions'] as DietaryRestrictions[];
-    const qPrepTimes = req.query['prepTime'] as string[];
-    const qIngredients = req.query['ingredients'] as string[];
+    const body: {
+        targetCuisines: string[],
+        targetPrepTimes: string[],
+        targetRestrictions: string[],
+        targetIngredients: string[]
+    } = req.body;
+    const {
+        targetCuisines,
+        targetPrepTimes,
+        targetRestrictions,
+        targetIngredients
+    } = body;
     const posts = await recipeCollection.get();
     res.send(posts.docs
         .map(doc => doc.data() as Recipe)
         .filter(({ cuisine, restrictions, prepTime, ingredients }) => {
-            if (qCuisines && !qCuisines.includes(cuisine)) return false;
-            if (qPrepTimes && !qPrepTimes.includes(prepTime.toString())) return false;
-            if (!containsAll(restrictions, qRestrictions)) return false;
-            return containsSome(ingredients, qIngredients);
+            if (targetCuisines && !targetCuisines.includes(cuisine)) {
+                return false;
+            }
+            if (targetPrepTimes && !targetPrepTimes.includes(prepTime.toString())) {
+                return false;
+            }
+            if (targetRestrictions && !containsAll(restrictions, targetRestrictions)) {
+                return false;
+            }
+            return !targetIngredients || containsSome(ingredients, targetIngredients);
         })
     );
+});
+
+app.get('/recipes/:name', async (req, res) => {
+    const posts = await recipeCollection.where('name', '==', req.params.name).get();
+    res.send(posts.docs.map(doc => doc.data() as Recipe));
 });
 
 app.post('/newRecipe', async (req, res) => {
@@ -55,4 +90,4 @@ app.post('/updateRecipe/:id', async (req, res) => {
     res.send(`Recipe with id ${id} updated`);
 });
 
-app.listen(port);
+app.listen(port, () => console.log(`Backend listening on port ${port}`));

@@ -12,9 +12,10 @@ export enum Cuisine {
 };
 
 export type Recipe = {
-    prepTime: number;
-    cuisine: Cuisine;
-    restrictions: DietaryRestrictions[];
+    name: string;
+    prepTime: string;
+    cuisine: string;
+    restrictions: string[];
     ingredients: string[];
     id?: string;
 };
