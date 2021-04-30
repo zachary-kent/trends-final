@@ -42,5 +42,17 @@ app.get('/recipes', async (req, res) => {
 });
 
 app.post('/newRecipe', async (req, res) => {
-
+    const newRecipe: Recipe = req.body;
+    const newDoc = recipeCollection.doc();
+    await newDoc.set(newRecipe);
+    res.send(`ID of new recipe: ${newDoc.id}`);
 });
+
+app.post('/updateRecipe/:id', async (req, res) => {
+    const updatedRecipe: Recipe = req.body;
+    const id: string = req.params.id;
+    await recipeCollection.doc(id).update(updatedRecipe);
+    res.send(`Recipe with id ${id} updated`);
+});
+
+app.listen(port);
