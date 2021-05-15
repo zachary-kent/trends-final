@@ -1,6 +1,6 @@
 import admin from 'firebase-admin';
 import express from 'express';
-import type { Recipe } from './types';
+import type { PrepTime, Recipe } from './types';
 
 const serviceAccount = require('./service-account.json');
 
@@ -43,7 +43,7 @@ app.get('/', (_req, res) => {
 app.get('/recipes', async (req, res) => {
     const body: {
         targetCuisines: string[],
-        targetPrepTimes: string[],
+        targetPrepTimes: PrepTime[]
         targetRestrictions: string[],
         targetIngredients: string[]
     } = req.body;
@@ -60,7 +60,10 @@ app.get('/recipes', async (req, res) => {
             if (targetCuisines && !targetCuisines.includes(cuisine)) {
                 return false;
             }
-            if (targetPrepTimes && !targetPrepTimes.includes(prepTime.toString())) {
+            const matchesPrepTime = !targetPrepTimes || targetPrepTimes.some(({ hours, minutes }) =>
+                hours === prepTime.hours && minutes === prepTime.minutes
+            );
+            if (!matchesPrepTime) {
                 return false;
             }
             if (targetRestrictions && !containsAll(restrictions, targetRestrictions)) {

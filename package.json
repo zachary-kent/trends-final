@@ -1,0 +1,21 @@
+{
+  "name": "trends-final",
+  "scripts": {
+    "server": "cd backend && yarn start",
+    "frontend": "cd frontend && yarn start",
+    "start": "concurrently \"yarn server\" \"yarn frontend\" "
+  },
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/zachary0kent/trends-final.git",
+  "author": "Zak Kent <zak33@cornell.edu>",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^6.1.0"
+  }
+}

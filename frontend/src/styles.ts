@@ -38,6 +38,9 @@ export const SectionContainer = styled.div`
         left: 60%;
         resize: none;
     }
+    p {
+        margin-right: 20px;
+    }
 `;
 
 export const SectionWrapper = styled.div`
@@ -51,6 +54,15 @@ export const SectionWrapper = styled.div`
 export const SiteHeader = styled.h1`
     font-color: ${colors.black};
     text-align: center;
+`;
+
+export const AuthContainer = styled.div`
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    h3 {
+        text-align: center;
+    }
 `;
 
 export const InputBar = styled.input`

@@ -11,11 +11,18 @@ export enum Cuisine {
     AMERICAN = 'american'
 };
 
+export type PrepTime = {
+    hours: number;
+    minutes: number;
+}
+
 export type Recipe = {
     name: string;
-    prepTime: string;
+    prepTime: PrepTime;
     cuisine: string;
     restrictions: string[];
     ingredients: string[];
+    author: string;
+    instructions: string;
     id?: string;
 };
