@@ -17,5 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "concurrently": "^6.1.0"
+  },
+  "devDependencies": {
+    "heroku": "^7.53.1"
   }
 }

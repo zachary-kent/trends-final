@@ -1,5 +1,7 @@
 import admin from 'firebase-admin';
 import express from 'express';
+import cors from 'cors';
+import path from 'path';
 import type { PrepTime, Recipe } from './types';
 
 const serviceAccount = require('./service-account.json');
@@ -13,6 +15,8 @@ const app = express();
 const port = 8080;
 
 app.use(express.json());
+app.use(cors());
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 const recipeCollection = db.collection('recipes');
 
@@ -93,4 +97,6 @@ app.post('/updateRecipe/:id', async (req, res) => {
     res.send(`Recipe with id ${id} updated`);
 });
 
-app.listen(port, () => console.log(`Backend listening on port ${port}`));
+app.listen(process.env.PORT || port, () => {
+    console.log(`Backend listening on port ${port}`);
+});
